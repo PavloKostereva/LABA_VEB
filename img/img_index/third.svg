@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="500" height="500" data-name="Layer 1">
+  <defs>
+    <linearGradient y2=".5" x2="1.016" y1=".5" x1="-.016" id="b">
+      <stop stop-color="#2ecc71" offset="0"></stop>
+      <stop stop-color="#2ac979" offset=".3"></stop>
+      <stop stop-color="#20c18e" offset=".76"></stop>
+      <stop stop-color="#1abc9c" offset="1"></stop>
+    </linearGradient>
+    <linearGradient y2=".5" x2="1" y1=".5" x1="0" id="a">
+      <stop stop-color="#2ecc71" offset="0"></stop>
+      <stop stop-color="#2ac97a" offset=".31"></stop>
+      <stop stop-color="#1fc091" offset=".81"></stop>
+      <stop stop-color="#1abc9c" offset="1"></stop>
+    </linearGradient>
+    <linearGradient xlink:href="#a" y2="370.14" x2="168.99" y1="370.14" x1="89.22" id="c"></linearGradient>
+    <linearGradient xlink:href="#a" y2="268.1" x2="288.75" y1="268.1" x1="208.98" id="d"></linearGradient>
+    <linearGradient xlink:href="#a" y2="158.27" x2="408.43" y1="158.27" x1="328.66" id="e"></linearGradient>
+    <linearGradient xlink:href="#a" y2="158.93" x2="374.06" y1="158.93" x1="63.89" id="f"></linearGradient>
+  </defs>
+  <circle stroke="url(#b)" stroke-width="14" stroke-miterlimit="10" fill="#9eefd2" r="225" cy="264" cx="249.33" class="cls-1"></circle>
+  <path fill="#e2f7f2" d="M75.07 344.49v67h109.59v-67H75.07zM91 370.14a4.83 4.83 0 0 1 4.87-4.78h66.47a4.78 4.78 0 1 1 0 9.56H95.87a4.83 4.83 0 0 1-4.87-4.78zM194.41 242.45v169H304v-169H194.41zm16.35 25.65a4.84 4.84 0 0 1 4.87-4.78h66.47a4.78 4.78 0 1 1 0 9.56h-66.47a4.83 4.83 0 0 1-4.87-4.78zM313.75 132.62v278.87h114.47V132.62H313.75zm16.68 25.65a4.83 4.83 0 0 1 4.87-4.78h66.47a4.78 4.78 0 1 1 0 9.56h-66.46a4.83 4.83 0 0 1-4.88-4.78z" class="cls-2"></path>
+  <path fill="url(#a)" d="M428.22 158.6a6.58 6.58 0 0 0 6.65-6.52v-24.24a6.58 6.58 0 0 0-6.65-6.52H308.87a6.58 6.58 0 0 0-6.65 6.52v103.31H189.53a6.58 6.58 0 0 0-6.65 6.52v95.52H70.19a6.58 6.58 0 0 0-6.65 6.52v76.56a6.58 6.58 0 0 0 6.65 6.52h358a6.58 6.58 0 0 0 6.65-6.52V177.73a6.65 6.65 0 0 0-13.29 0v232h-106V134.36h106v17.72a6.59 6.59 0 0 0 6.67 6.52zM76.84 346.23h106v63.52h-106v-63.52zm119.34-6.52v-95.52h106v165.56h-106v-70.04z" class="cls-3"></path>
+  <path fill="url(#c)" d="M162.34 363.62H95.87a6.52 6.52 0 1 0 0 13h66.47a6.52 6.52 0 1 0 0-13z" class="cls-4"></path>
+  <path fill="url(#d)" d="M282.1 261.58h-66.47a6.52 6.52 0 1 0 0 13h66.47a6.52 6.52 0 1 0 0-13z" class="cls-5"></path>
+  <path fill="url(#e)" d="M335.31 151.75a6.52 6.52 0 1 0 0 13h66.47a6.52 6.52 0 1 0 0-13h-66.47z" class="cls-6"></path>
+  <path fill="url(#f)" d="M70.61 311.07a6.76 6.76 0 0 0 4.75-1.93L360.63 29.28v35.53a6.71 6.71 0 0 0 13.43 0V13.38a6.65 6.65 0 0 0-6.71-6.59h-52.43a6.59 6.59 0 1 0 0 13.17h36.22L65.86 299.82a6.5 6.5 0 0 0 0 9.31 6.76 6.76 0 0 0 4.75 1.94z" class="cls-7"></path>
+  <path fill="#c2f9ec" d="M173 363.62h-10.66a6.52 6.52 0 1 1 0 13H173a6.52 6.52 0 1 0 0-13zM76.84 346.22h10.64v63.52H76.84zM292.74 261.58H282.1a6.52 6.52 0 1 1 0 13h10.64a6.52 6.52 0 1 0 0-13zM206.81 244.19h-10.63v165.56h10.63V244.19zM412.42 151.75h-10.64a6.52 6.52 0 1 1 0 13h10.64a6.52 6.52 0 1 0 0-13zM326.16 134.36h-10.64v275.39h10.64V134.36z" class="cls-8"></path>
+  <path fill="#1abc9c" d="M465.29 348.69a232.39 232.39 0 0 1-66.4 92.63l-11.39-8.73A225.41 225.41 0 0 0 452.91 342l12.38 6.69z" class="cls-9"></path>
+  <path fill="#2ecc71" d="M33.5 348.69a232.39 232.39 0 0 0 66.4 92.63l11.39-8.73A225.41 225.41 0 0 1 45.88 342l-12.38 6.69z" class="cls-10"></path>
+  <path fill="#fff" d="M45.84 375.5A279.51 279.51 0 0 0 82 424.75l-36.17.08.01-49.33zM453 375.5a279.51 279.51 0 0 1-36.16 49.25l36.17.08-.01-49.33z" class="cls-11"></path>
+</svg>

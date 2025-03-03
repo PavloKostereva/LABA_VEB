@@ -1,0 +1,175 @@
+/* * {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+header {
+    background-color: #78A4CE;
+    color: white;
+    padding: 25px;
+    text-align: center;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+}
+
+
+
+nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+nav ul li {
+    display: inline;
+    margin: 0 25px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+nav ul li a:hover {
+    text-decoration: underline;
+    color: #356797;
+}
+
+.head-logo {
+    display: flex;
+}
+
+.head-logo h4 {
+    display: inline;
+}
+
+main {
+    padding: 60px 40px;
+    text-align: center;
+}
+
+main h2 {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    font-weight: bold;
+    color: #333;
+}
+
+main p {
+    font-size: 1.1em;
+    margin-bottom: 20px;
+    line-height: 1.6;
+    color: #555;
+}
+
+.partners {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 30px;
+}
+
+.partners img {
+    width: 150px;
+    height: 150px;
+    object-fit: contain;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.partners img:hover {
+    transform: scale(1.05);
+}
+
+.cont {
+    text-align: right;
+    padding-top: 30px;
+}
+
+footer {
+    text-align: center;
+    padding: 10px;
+    background: #97bbdf;
+    color: white;
+    width: 100%;
+}
+
+ footer a {
+     color: #538fc8;
+     text-decoration: none;
+     font-weight: bold;
+ }
+
+
+/*для пленшетів */
+
+/* @media screen  and(max-width: 768px){
+    header {
+            flex-direction: column;
+            text-align: center;
+        }
+    
+        nav ul {
+            flex-direction: column;
+            text-align: center;
+            padding: 10px 0;
+        }
+    
+        nav ul li {
+            margin: 10px 0;
+            display: block;
+        }
+    
+        .head-logo {
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+    
+        main {
+            padding: 40px 20px;
+        }
+    
+        .partners img {
+            width: 120px;
+            height: 120px;
+        }
+    
+} */
+
+/*для смартфонів*/
+
+/* @media screen and (max-width: 480px) {
+    main h2 {
+        font-size: 1.8em;
+    }
+
+    main p {
+        font-size: 0.95em;
+    }
+
+    .partners img {
+        width: 100px;
+        height: 100px;
+    }
+
+    .cont {
+        text-align: center;
+    }
+
+    footer {
+        padding: 15px;
+        font-size: 14px;
+    }
+}  */
