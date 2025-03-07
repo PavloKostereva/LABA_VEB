@@ -1,4 +1,3 @@
-/* Загальні стилі */
 * {
     box-sizing: border-box;
 }
@@ -69,19 +68,18 @@ p {
     color: #555;
 }
 
-/* Головний розділ */
 .main-sect {
     background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
         url("../img/img_index/logo-back.jpg");
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
+    background-attachment: fixed;
     color: white;
     text-align: center;
     padding: 40px;
 }
 
-/* Карточки ініціатив */
 .grid-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -97,6 +95,10 @@ p {
     border-radius: 8px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
     text-align: center;
+    position: relative;
+    /* Додаємо для абсолютного позиціонування */
+    overflow: hidden;
+    /* Щоб вміст не виходив за межі */
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -111,6 +113,31 @@ p {
     max-height: 200px;
     object-fit: cover;
     border-radius: 8px;
+    transition: opacity 0.3s ease;
+}
+
+.initiative-card:hover img {
+    opacity: 0.5;
+    /* Робимо картинку напівпрозорою */
+}
+
+.initiative-card .initiative-text {
+    position: absolute;
+    top: 10%;
+    /* Відстань від верхнього краю */
+    left: 50%;
+    transform: translateX(-50%);
+    /* Вирівнюємо текст по горизонталі */
+    color: white;
+    font-size: 1.2em;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+    display: none;
+}
+
+.initiative-card:hover .initiative-text {
+    display: block;
+    /* Показуємо текст на картинці при наведенні */
 }
 
 .join-btn {
@@ -129,7 +156,6 @@ p {
     background: #506f8e;
 }
 
-/* Партнери */
 .partners {
     display: flex;
     justify-content: center;
@@ -170,7 +196,7 @@ footer a:hover {
     text-decoration: underline;
 }
 
-/* Адаптація під планшети */
+/* плншет*/
 @media (max-width: 768px) {
     header {
         flex-direction: column;
@@ -201,7 +227,7 @@ footer a:hover {
     }
 }
 
-/* Адаптація під смартфони */
+/* смартфони */
 @media (max-width: 480px) {
     header {
         padding: 15px;
