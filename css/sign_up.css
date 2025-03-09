@@ -7,6 +7,9 @@ body {
     margin: 0;
     padding: 0;
     background-color: white;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 header {
@@ -63,99 +66,68 @@ nav ul li a:hover {
     margin-left: 15px;
 }
 
-h2 {
-    font-size: 28px;
-}
-
-p {
-    font-size: 18px;
-}
-
 .main-sect {
-    background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-        url("../img/img_index/logo-back.jpg");
+    flex-grow: 1;
+    /* Розтягується, щоб футер був внизу */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url("../img/img_index/logo-back.jpg");
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
     background-attachment: fixed;
     color: white;
-    text-align: center;
     padding: 40px;
 }
 
 .main-sect-text {
     max-width: 600px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.login-form {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 500px;
     margin: 0 auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.about {
-    padding: 30px;
-    background-color: #78A4CE;
-    text-align: center;
-}
-
-.about h4 {
-    margin: 0;
-    color: white;
-}
-
-.about p {
-    color: white;
-    max-width: 1000px;
-    margin: 20px auto;
-    text-align: justify;
-}
-
-a.btn {
-    display: inline-block;
-    padding: 12px 24px;
-    background-color: white;
-    color: #356797;
-    border: 2px solid #356797;
-    border-radius: 20px;
-    text-decoration: none;
-    font-size: 16px;
+.login-form label {
+    display: block;
+    margin: 10px 0 5px;
     font-weight: bold;
-    text-align: center;
-    transition: background-color 0.3s, color 0.3s;
+    color: #356797;
 }
 
-a.btn:hover {
+.login-form input {
+    width: 100%;
+    padding: 10px;
+    /* Збільшив padding для кращого вигляду */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+.login-form .btn {
+    display: block;
+    width: 100%;
+    padding: 10px;
     background-color: #356797;
     color: white;
+    border: none;
+    border-radius: 5px;
+    margin-top: 15px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s;
 }
 
-.social_proj {
-    display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;
-    padding: 60px;
-    background-color: #78A4CE;
-}
-
-.social_proj article {
-    max-width: 250px;
-    padding: 20px;
-    background-color: white;
-    border-radius: 30px;
-    text-align: center;
-    margin-bottom: 15px;
-}
-
-.social_proj img {
-    width: 100%;
-    max-width: 120px;
-    height: auto;
-}
-
-.social_proj h3 {
-    color: #356797;
-    font-size: 18px;
-}
-
-.social_proj p {
-    color: #78A4CE;
-    font-size: 14px;
+.login-form .btn:hover {
+    background-color: #274d73;
 }
 
 footer {
@@ -163,6 +135,7 @@ footer {
     color: white;
     text-align: center;
     padding: 20px;
+    flex-shrink: 0;
 }
 
 footer a {
@@ -175,10 +148,6 @@ footer a:hover {
     text-decoration: underline;
 }
 
-footer p {
-    margin: 10px 0;
-}
-
 @media (max-width: 768px) {
     header {
         flex-direction: column;
@@ -188,11 +157,6 @@ footer p {
     nav ul {
         flex-direction: column;
         align-items: center;
-    }
-
-    .auth-buttons {
-        margin-top: 15px;
-        justify-content: center;
     }
 }
 
@@ -204,10 +168,5 @@ footer p {
     nav ul {
         flex-direction: column;
         padding: 10px 0;
-    }
-
-    .auth-buttons {
-        flex-direction: column;
-        align-items: center;
     }
 }

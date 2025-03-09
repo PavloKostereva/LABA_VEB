@@ -6,21 +6,27 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+    background-color: white;
 }
 
 header {
     background-color: #78A4CE;
     color: white;
     padding: 25px;
-    text-align: center;
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
+}
+
+.head-logo {
+    display: flex;
+    align-items: center;
+}
+
+nav {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
 }
 
 nav ul {
@@ -32,7 +38,7 @@ nav ul {
 }
 
 nav ul li {
-    display: inline;
+    margin: 0;
 }
 
 nav ul li a {
@@ -47,9 +53,14 @@ nav ul li a:hover {
     color: #356797;
 }
 
-.head-logo {
+.auth-buttons {
     display: flex;
-    align-items: center;
+    gap: 15px;
+}
+
+.log_in_m,
+.sign_up_m {
+    margin-left: 15px;
 }
 
 main {
