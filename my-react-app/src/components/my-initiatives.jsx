@@ -1,20 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import '../assets/css/all.css';
-//import "boxicons/css/boxicons.min.css"; // Іконки Boxicons
 
 const MyInitiatives = () => {
     const [myInitiatives, setMyInitiatives] = useState([]);
-
+    const [user, setUser] = useState(null);
+    
     useEffect(() => {
+        const auth = getAuth();
+        onAuthStateChanged(auth, (currentUser) => {
+            setUser(currentUser);
+        });
+        
         const storedInitiatives = JSON.parse(localStorage.getItem("myInitiatives")) || [];
-        console.log("Отримані ініціативи з localStorage:", storedInitiatives);
         setMyInitiatives(storedInitiatives);
     }, []);
 
     const leaveInitiative = (initiativeId) => {
         const updatedInitiatives = myInitiatives.filter(item => item.id !== initiativeId);
-        
         let initiatives = JSON.parse(localStorage.getItem("initiatives")) || [];
         let initiative = initiatives.find(item => item.id === initiativeId);
 
@@ -25,7 +29,21 @@ const MyInitiatives = () => {
 
         localStorage.setItem("myInitiatives", JSON.stringify(updatedInitiatives));
         setMyInitiatives(updatedInitiatives);
-        console.log("Від'єднано від ініціативи. Залишилося ініціатив:", updatedInitiatives);
+    };
+
+    const rateInitiative = (initiativeId, rating) => {
+        if (!user) {
+            alert("Будь ласка, увійдіть у систему, щоб залишити оцінку.");
+            return;
+        }
+        let initiatives = JSON.parse(localStorage.getItem("initiatives")) || [];
+        let initiative = initiatives.find(item => item.id === initiativeId);
+        if (initiative) {
+            initiative.ratings = initiative.ratings || [];
+            initiative.ratings.push({ user: user.uid, rating });
+            localStorage.setItem("initiatives", JSON.stringify(initiatives));
+            alert("Оцінку додано!");
+        }
     };
 
     return (
@@ -37,16 +55,15 @@ const MyInitiatives = () => {
                         <h4>Helping Hands</h4>
                     </div>
                 </div>
-                <nav>
-                <ul>
-                    <li><Link to="/">Головна</Link></li>
-                    <li><Link to="/initiatives">Доступні ініціативи</Link></li>
-                    <li><Link to="/my-initiatives">Мої ініціативи</Link></li>
-                    <li><Link to="/about" target="_blank">Про нас</Link></li>
-                    <li className="log_in_m"><Link to="/log_in">Увійти <i className="bx bx-log-in"></i></Link></li>
-                    <li className="sign_up_m"><Link to="/sign_up">Зареєструватися <i className="bx bx-log-in-circle"></i></Link></li>
-                </ul>
-                </nav>
+        <nav>
+          <ul>
+            <li><Link to="/">Головна</Link></li>
+            <li><Link to="/initiatives">Доступні ініціативи</Link></li>
+            <li><Link to="/my-initiatives">Мої ініціативи</Link></li>
+            <li><Link to="/about">Про нас</Link></li>
+            <li className="log_in_m"><Link to="/log_in">Увійти <i className="bx bx-log-in"></i></Link></li>
+            </ul>
+        </nav>
             </header>
 
             <main id="my-initiatives-container">
@@ -63,6 +80,14 @@ const MyInitiatives = () => {
                                 <p><strong>Залишилось волонтерів:</strong> {initiative.neededVolunteers}</p>
                                 <p>{initiative.description}</p>
                                 <button className="leave-btn" onClick={() => leaveInitiative(initiative.id)}>Від'єднатися</button>
+                                <div className="rating-section">
+                                    <p><strong>Оцініть ініціативу:</strong></p>
+                                    {[1, 2, 3, 4, 5].map(star => (
+                                        <button key={star} onClick={() => rateInitiative(initiative.id, star)}>
+                                            {"★".repeat(star)}
+                                        </button>
+                                    ))}
+                                </div>
                             </article>
                         ))}
                     </div>

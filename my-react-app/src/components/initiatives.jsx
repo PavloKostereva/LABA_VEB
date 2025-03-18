@@ -9,13 +9,18 @@ const InitiativesPage = () => {
   const [cityFilter, setCityFilter] = useState("all");
   const [dateFilter, setDateFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
+  const [showModal, setShowModal] = useState(false);
+  const [selectedInitiative, setSelectedInitiative] = useState(null);
+  const [userName, setUserName] = useState("");
+  const [userEmail, setUserEmail] = useState("");
 
-   useEffect(() => {
+  useEffect(() => {
     const storedInitiatives = JSON.parse(localStorage.getItem("initiatives")) || [
       { id: 1, title: "Допомога дітям", date: "2025-03-10", place: "Київ", neededVolunteers: 10, type: "Соціальні", img: help1, description: "Допомога дітям у дитячому будинку." },
       { id: 2, title: "Прибирання парку", date: "2025-03-15", place: "Львів", neededVolunteers: 20, img: help1, description: "Організоване прибирання місцевого парку." },
       { id: 3, title: "Плетіння маскувальних сіток", date: "2025-03-20", place: "Одеса", neededVolunteers: 15, img: help1, description: "Допомога у плетінні сіток для військових." },
       { id: 4, title: "Допомога літнім людям", date: "2025-03-25", place: "Харків", neededVolunteers: 5, img: help1, description: "Збір продуктів та ліків для людей похилого віку." },
+
       { id: 5, title: "Збір одягу для нужденних", date: "2025-04-05", place: "Дніпро", neededVolunteers: 12, img: help1, description: "Організація збору та роздачі одягу для малозабезпечених." },
       { id: 7, title: "Допомога дітям", date: "2025-03-10", place: "Київ", neededVolunteers: 10, img: help1, description: "Допомога дітям у дитячому будинку." },
       { id: 8, title: "Прибирання парку", date: "2025-03-15", place: "Львів", neededVolunteers: 20, img: help1, description: "Організоване прибирання місцевого парку." },
@@ -34,6 +39,7 @@ const InitiativesPage = () => {
       { id: 21, title: "Допомога літнім людям", date: "2025-03-25", place: "Харків", neededVolunteers: 5, img: help1, description: "Збір продуктів та ліків для людей похилого віку." },
       { id: 22, title: "Збір одягу для нужденних", date: "2025-04-05", place: "Дніпро", neededVolunteers: 12, img: help1, description: "Організація збору та роздачі одягу для малозабезпечених." },
       { id: 23, title: "Еко-акція в лісі", date: "2025-04-10", place: "Київ", neededVolunteers: 30, img: help1, description: "Прибирання сміття та висадка дерев у місцевому лісі." },
+
     ];
     setInitiatives(storedInitiatives);
 
@@ -41,19 +47,26 @@ const InitiativesPage = () => {
     setMyInitiatives(storedMyInitiatives);
   }, []);
 
-  const handleJoin = (initiativeId) => {
-    const updatedInitiatives = [...initiatives];
-    const initiativeIndex = updatedInitiatives.findIndex(item => item.id === initiativeId);
+  const handleJoinClick = (initiative) => {
+    setSelectedInitiative(initiative);
+    setShowModal(true);
+  };
 
+  const handleConfirmJoin = () => {
+    if (!userName || !userEmail) return;
+    const updatedInitiatives = [...initiatives];
+    const initiativeIndex = updatedInitiatives.findIndex(item => item.id === selectedInitiative.id);
     if (initiativeIndex !== -1 && updatedInitiatives[initiativeIndex].neededVolunteers > 0) {
       updatedInitiatives[initiativeIndex].neededVolunteers--;
       setInitiatives(updatedInitiatives);
       localStorage.setItem("initiatives", JSON.stringify(updatedInitiatives));
-
       const updatedMyInitiatives = [...myInitiatives, updatedInitiatives[initiativeIndex]];
       setMyInitiatives(updatedMyInitiatives);
       localStorage.setItem("myInitiatives", JSON.stringify(updatedMyInitiatives));
     }
+    setShowModal(false);
+    setUserName("");
+    setUserEmail("");
   };
 
   const filteredInitiatives = initiatives
@@ -80,7 +93,7 @@ const InitiativesPage = () => {
       <header>
         <div className="head-logo">
           <div className="logo">
-            <i className="bx bx-shield-plus"></i>
+            <i className="bx bx-shield-plus" ></i>
             <h4>Helping Hands</h4>
           </div>
         </div>
@@ -89,9 +102,8 @@ const InitiativesPage = () => {
             <li><Link to="/">Головна</Link></li>
             <li><Link to="/initiatives">Доступні ініціативи</Link></li>
             <li><Link to="/my-initiatives">Мої ініціативи</Link></li>
-            <li><Link to="/about" target="_blank">Про нас</Link></li>
+            <li><Link to="/about">Про нас</Link></li>
             <li className="log_in_m"><Link to="/log_in">Увійти <i className="bx bx-log-in"></i></Link></li>
-            <li className="sign_up_m"><Link to="/sign_up">Зареєструватися <i className="bx bx-log-in-circle"></i></Link></li>
           </ul>
         </nav>
       </header>
@@ -137,7 +149,7 @@ const InitiativesPage = () => {
               <p>{initiative.description}</p>
               <button
                 className="join-btn"
-                onClick={() => handleJoin(initiative.id)}
+                onClick={() => handleJoinClick(initiative)}
                 disabled={initiative.neededVolunteers <= 0 || myInitiatives.some(item => item.id === initiative.id)}
               >
                 {initiative.neededVolunteers <= 0 || myInitiatives.some(item => item.id === initiative.id) ? "Ви приєдналися" : "Приєднатися"}
@@ -146,6 +158,28 @@ const InitiativesPage = () => {
           ))}
         </div>
       </main>
+
+    {showModal && (
+        <div className="modal">
+            <div className="modal-content">
+                <h3>Введіть ваші дані</h3>
+                <input
+                    type="text"
+                    placeholder="Ваше ім'я"
+                    value={userName}
+                    onChange={(e) => setUserName(e.target.value)}
+                />
+                <input
+                    type="email"
+                    placeholder="Ваш Email"
+                    value={userEmail}
+                    onChange={(e) => setUserEmail(e.target.value)}
+                />
+                <button onClick={handleConfirmJoin}>Підтвердити</button>
+                <button onClick={() => setShowModal(false)}>Скасувати</button>
+            </div>
+        </div>
+    )}
 
       <footer>
         <p>Приєднуйтесь до нас і станьте частиною змін!</p>
@@ -161,6 +195,3 @@ const InitiativesPage = () => {
 };
 
 export default InitiativesPage;
-
-
-

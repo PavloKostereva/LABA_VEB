@@ -207,6 +207,159 @@ footer a:hover {
     text-decoration: underline;
 }
 
+.btn:hover {
+    transform: scale(1.05);
+}
+
+.auth-form {
+    max-width: 400px;
+    width: 100%;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin: 50px auto;
+}
+
+.auth-form label {
+    font-weight: bold;
+    color: #333;
+}
+
+.auth-form input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.auth-form input:focus {
+    border-color: #438cd5;
+}
+
+.btn {
+    padding: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+    text-align: center;
+}
+
+.btn:hover {
+    transform: scale(1.05);
+}
+
+.btn:first-of-type {
+    background: #007bff;
+    color: #fff;
+}
+
+.btn:first-of-type:hover {
+    background: #0056b3;
+}
+
+.google-btn {
+    background: #db4437;
+    color: white;
+}
+
+.google-btn:hover {
+    background: #b33627;
+}
+
+.auth-form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: #f4f4f4;
+    padding: 20px;
+}
+
+
+/* Стилі для модального вікна */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Напівпрозорий чорний фон */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    /* Щоб модальне вікно було поверх інших елементів */
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+}
+
+.modal-content h3 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.modal-content input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.modal-content input:focus {
+    border-color: #438cd5;
+}
+
+.modal-content button {
+    padding: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+    margin: 5px;
+}
+
+.modal-content button:first-of-type {
+    background: #007bff;
+    color: #fff;
+}
+
+.modal-content button:first-of-type:hover {
+    background: #0056b3;
+}
+
+.modal-content button:last-of-type {
+    background: #ccc;
+    color: #333;
+}
+
+.modal-content button:last-of-type:hover {
+    background: #999;
+}
 /* плншет*/
 @media (max-width: 768px) {
     header {

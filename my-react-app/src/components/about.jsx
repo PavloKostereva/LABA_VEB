@@ -22,14 +22,15 @@ function About() {
         </div>
 
         <nav>
+        <nav>
           <ul>
             <li><Link to="/">Головна</Link></li>
             <li><Link to="/initiatives">Доступні ініціативи</Link></li>
             <li><Link to="/my-initiatives">Мої ініціативи</Link></li>
-            <li><Link to="/about" target="_blank">Про нас</Link></li>
+            <li><Link to="/about">Про нас</Link></li>
             <li className="log_in_m"><Link to="/log_in">Увійти <i className="bx bx-log-in"></i></Link></li>
-            <li className="sign_up_m"><Link to="/sign_up">Зареєструватися <i className="bx bx-log-in-circle"></i></Link></li>
-          </ul>
+            </ul>
+        </nav>
         </nav>
       </header>
 
