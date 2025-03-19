@@ -360,6 +360,29 @@ footer a:hover {
 .modal-content button:last-of-type:hover {
     background: #999;
 }
+
+.profile-container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+.logout-button {
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+.logout-button:hover {
+    background-color: #ff1a1a;
+}
 /* плншет*/
 @media (max-width: 768px) {
     header {

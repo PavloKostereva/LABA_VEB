@@ -1,9 +1,11 @@
-import React, { useState, useEffect, StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { getAuth, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { app, googleAuthProvider } from "../js/firebase";
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "../js/firebase";
 import '../assets/css/all.css';
+
 const auth = getAuth(app);
 
 const AuthForm = ({ isRegister }) => {
@@ -12,47 +14,64 @@ const AuthForm = ({ isRegister }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [user, setUser] = useState(null);
   const [error, setError] = useState('');
+  const navigate = useNavigate(); // Хук для навігації
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (maybeUser) => {
       setUser(maybeUser);
+      if (maybeUser) {
+        navigate("/");
+      }
     });
     return () => unsubscribe();
-  }, []);
+  }, [navigate]);
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError('');
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
 
-  if (!user && isRegister) {
-    setError('Спочатку увійдіть у профіль.');
-    return;
-  }
-
-  if (isRegister && password !== confirmPassword) {
-    setError('Паролі не співпадають!');
-    return;
-  }
-
-  try {
-    if (isRegister) {
-      await createUserWithEmailAndPassword(auth, email, password);
-    } else {
-      await signInWithEmailAndPassword(auth, email, password);
+    if (isRegister && password !== confirmPassword) {
+      setError('Паролі не співпадають!');
+      return;
     }
-  } catch (err) {
-    setError(err.message);
-  }
-};
 
-
-  const handleGoogleSignIn = async () => {
     try {
-      await signInWithPopup(auth, googleAuthProvider);
+      if (isRegister) {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        await setDoc(doc(db, "users", user.uid), {
+          email: user.email,
+          displayName: user.displayName || "Невідомий користувач",
+          createdAt: new Date().toISOString(),
+        });
+
+        console.log("Користувач успішно зареєстрований та доданий до Firestore!");
+      } else {
+        await signInWithEmailAndPassword(auth, email, password);
+      }
     } catch (err) {
       setError(err.message);
     }
   };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleAuthProvider);
+      const user = result.user;
+
+      await setDoc(doc(db, "users", user.uid), {
+        email: user.email,
+        displayName: user.displayName || "Невідомий користувач",
+        createdAt: new Date().toISOString(),
+      });
+
+      console.log("Користувач успішно увійшов через Google та доданий до Firestore!");
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
 
   return (
     <div>
@@ -70,10 +89,11 @@ const handleSubmit = async (e) => {
             <li><Link to="/my-initiatives">Мої ініціативи</Link></li>
             <li><Link to="/about">Про нас</Link></li>
             <li className="log_in_m"><Link to="/log_in">Увійти <i className="bx bx-log-in"></i></Link></li>
+            <li><Link to="/profile">Профіль</Link></li>
           </ul>
         </nav>
       </header>
-      
+
       <section className="main-sect">
         <div className="main-sect-text">
           <h2>{isRegister ? 'Реєстрація' : 'Вхід'} до акаунту</h2>
@@ -102,7 +122,6 @@ const handleSubmit = async (e) => {
         </div>
       </section>
 
-      
       <footer>
         <p>Приєднуйтесь до нас і станьте частиною змін!</p>
         <p>

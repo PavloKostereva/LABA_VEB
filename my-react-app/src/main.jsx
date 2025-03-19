@@ -6,6 +6,7 @@ import HomePage from './components/HomePage.jsx';
 import About from './components/about.jsx';
 import Initiatives from './components/initiatives.jsx';
 import MyInitiatives from './components/my-initiatives.jsx';
+import MyProfile from './components/profile.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -17,6 +18,7 @@ createRoot(document.getElementById('root')).render(
         <Route path="/sign_up" element={<SignUp />} />
         <Route path="/initiatives" element={<Initiatives />} />
         <Route path="/my-initiatives" element={<MyInitiatives />} />
+        <Route path="/profile" element={ <MyProfile/>}></Route>
       </Routes>
     </Router>
   </StrictMode>

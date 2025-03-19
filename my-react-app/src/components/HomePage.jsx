@@ -25,6 +25,7 @@ function HomePage() {
             <li><Link to="/my-initiatives">Мої ініціативи</Link></li>
             <li><Link to="/about">Про нас</Link></li>
             <li className="log_in_m"><Link to="/log_in">Увійти <i className="bx bx-log-in"></i></Link></li>
+            <li><Link to="/profile">Профіль</Link></li>
             </ul>
         </nav>
         </nav>

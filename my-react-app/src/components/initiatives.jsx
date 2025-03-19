@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Link } from 'react-router-dom';
 import '../assets/css/all.css';
 import help1 from '../assets/img/img_initiatives/help1.jpg';
+import { db, auth } from "../js/firebase";
+import { collection, getDocs, addDoc, doc, setDoc } from "firebase/firestore";
 
 const InitiativesPage = () => {
   const [initiatives, setInitiatives] = useState([]);
@@ -13,60 +15,120 @@ const InitiativesPage = () => {
   const [selectedInitiative, setSelectedInitiative] = useState(null);
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
+  const [ratings, setRatings] = useState({});//для оцінок
+
 
   useEffect(() => {
-    const storedInitiatives = JSON.parse(localStorage.getItem("initiatives")) || [
-      { id: 1, title: "Допомога дітям", date: "2025-03-10", place: "Київ", neededVolunteers: 10, type: "Соціальні", img: help1, description: "Допомога дітям у дитячому будинку." },
-      { id: 2, title: "Прибирання парку", date: "2025-03-15", place: "Львів", neededVolunteers: 20, img: help1, description: "Організоване прибирання місцевого парку." },
-      { id: 3, title: "Плетіння маскувальних сіток", date: "2025-03-20", place: "Одеса", neededVolunteers: 15, img: help1, description: "Допомога у плетінні сіток для військових." },
-      { id: 4, title: "Допомога літнім людям", date: "2025-03-25", place: "Харків", neededVolunteers: 5, img: help1, description: "Збір продуктів та ліків для людей похилого віку." },
+    const fetchInitiatives = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "initiatives"));
+        const initiativesList = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setInitiatives(initiativesList);
+      } catch (error) {
+        console.error("Помилка під час отримання ініціатив: ", error);
+      }
+    };
 
-      { id: 5, title: "Збір одягу для нужденних", date: "2025-04-05", place: "Дніпро", neededVolunteers: 12, img: help1, description: "Організація збору та роздачі одягу для малозабезпечених." },
-      { id: 7, title: "Допомога дітям", date: "2025-03-10", place: "Київ", neededVolunteers: 10, img: help1, description: "Допомога дітям у дитячому будинку." },
-      { id: 8, title: "Прибирання парку", date: "2025-03-15", place: "Львів", neededVolunteers: 20, img: help1, description: "Організоване прибирання місцевого парку." },
-      { id: 9, title: "Плетіння маскувальних сіток", date: "2025-03-20", place: "Одеса", neededVolunteers: 15, img: help1, description: "Допомога у плетінні сіток для військових." },
-      { id: 10, title: "Допомога літнім людям", date: "2025-03-25", place: "Харків", neededVolunteers: 5, img: help1, description: "Збір продуктів та ліків для людей похилого віку." },
-      { id: 11, title: "Збір одягу для нужденних", date: "2025-04-05", place: "Дніпро", neededVolunteers: 12, img: help1, description: "Організація збору та роздачі одягу для малозабезпечених." },
-      { id: 12, title: "Еко-акція в лісі", date: "2025-04-10", place: "Київ", neededVolunteers: 30, img: help1, description: "Прибирання сміття та висадка дерев у місцевому лісі." },
-
-      { id: 13, title: "Прибирання парку", date: "2025-03-15", place: "Львів", neededVolunteers: 20, img: help1, description: "Організоване прибирання місцевого парку." },
-      { id: 14, title: "Плетіння маскувальних сіток", date: "2025-03-20", place: "Одеса", neededVolunteers: 15, img: help1, description: "Допомога у плетінні сіток для військових." },
-      { id: 15, title: "Допомога літнім людям", date: "2025-03-25", place: "Харків", neededVolunteers: 5, img: help1, description: "Збір продуктів та ліків для людей похилого віку." },
-      { id: 16, title: "Збір одягу для нужденних", date: "2025-04-05", place: "Дніпро", neededVolunteers: 12, img: help1, description: "Організація збору та роздачі одягу для малозабезпечених." },
-      { id: 18, title: "Допомога дітям", date: "2025-03-10", place: "Київ", neededVolunteers: 10, img: help1, description: "Допомога дітям у дитячому будинку." },
-      { id: 19, title: "Прибирання парку", date: "2025-03-15", place: "Львів", neededVolunteers: 20, img: help1, description: "Організоване прибирання місцевого парку." },
-      { id: 20, title: "Плетіння маскувальних сіток", date: "2025-03-20", place: "Одеса", neededVolunteers: 15, img: help1, description: "Допомога у плетінні сіток для військових." },
-      { id: 21, title: "Допомога літнім людям", date: "2025-03-25", place: "Харків", neededVolunteers: 5, img: help1, description: "Збір продуктів та ліків для людей похилого віку." },
-      { id: 22, title: "Збір одягу для нужденних", date: "2025-04-05", place: "Дніпро", neededVolunteers: 12, img: help1, description: "Організація збору та роздачі одягу для малозабезпечених." },
-      { id: 23, title: "Еко-акція в лісі", date: "2025-04-10", place: "Київ", neededVolunteers: 30, img: help1, description: "Прибирання сміття та висадка дерев у місцевому лісі." },
-
-    ];
-    setInitiatives(storedInitiatives);
-
-    const storedMyInitiatives = JSON.parse(localStorage.getItem("myInitiatives")) || [];
-    setMyInitiatives(storedMyInitiatives);
+    fetchInitiatives();
   }, []);
+
+  // Функція для додавання нової ініціативи
+  const addInitiative = async () => {
+    try {
+      const docRef = await addDoc(collection(db, "initiatives"), {
+        title: "Допомога дітям",
+        date: "2025-03-10",
+        place: "Львів",
+        neededVolunteers: 10,
+        type: "Соціальні",
+        img: "help1.jpg",
+        description: "Допомога дітям у дитячому будинку.",
+      });
+      console.log("Документ успішно створено з ID: ", docRef.id);
+    } catch (error) {
+      console.error("Помилка при додаванні документа: ", error);
+    }
+  };
 
   const handleJoinClick = (initiative) => {
     setSelectedInitiative(initiative);
     setShowModal(true);
   };
 
-  const handleConfirmJoin = () => {
+  const handleConfirmJoin = async () => {
     if (!userName || !userEmail) return;
     const updatedInitiatives = [...initiatives];
-    const initiativeIndex = updatedInitiatives.findIndex(item => item.id === selectedInitiative.id);
+    const initiativeIndex = updatedInitiatives.findIndex(
+      (item) => item.id === selectedInitiative.id
+    );
+
     if (initiativeIndex !== -1 && updatedInitiatives[initiativeIndex].neededVolunteers > 0) {
       updatedInitiatives[initiativeIndex].neededVolunteers--;
       setInitiatives(updatedInitiatives);
-      localStorage.setItem("initiatives", JSON.stringify(updatedInitiatives));
+
       const updatedMyInitiatives = [...myInitiatives, updatedInitiatives[initiativeIndex]];
       setMyInitiatives(updatedMyInitiatives);
-      localStorage.setItem("myInitiatives", JSON.stringify(updatedMyInitiatives));
+
+      // Збереження ініціативи користувача в Firestore
+      if (auth.currentUser) {
+        await setDoc(doc(db, "userInitiatives", `${auth.currentUser.uid}_${selectedInitiative.id}`), {
+          userId: auth.currentUser.uid,
+          initiativeId: selectedInitiative.id,
+          initiative: selectedInitiative,
+        });
+      }
     }
+
     setShowModal(false);
     setUserName("");
     setUserEmail("");
+  };
+
+  // Функція для оцінювання
+  const handleRating = async (initiativeId, rating) => {
+    if (!auth.currentUser) {
+      alert("Будь ласка, увійдіть, щоб залишити оцінку.");
+      return;
+    }
+
+    try {
+      await setDoc(doc(db, "ratings", `${auth.currentUser.uid}_${initiativeId}`), {
+        userId: auth.currentUser.uid,
+        initiativeId,
+        rating,
+      });
+
+      setRatings((prevRatings) => ({
+        ...prevRatings,
+        [initiativeId]: rating,
+      }));
+
+      console.log("Оцінка успішно додана!");
+    } catch (error) {
+      console.error("Помилка під час додавання оцінки: ", error);
+    }
+  };
+
+  // Відображення зірочок для оцінювання
+  const renderRatingStars = (initiativeId) => {
+    const currentRating = ratings[initiativeId] || 0;
+
+    return (
+      <div className="rating-stars">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <span
+            key={star}
+            className={`star ${star <= currentRating ? "active" : ""}`}
+            onClick={() => handleRating(initiativeId, star)}
+          >
+            ⭐
+          </span>
+        ))}
+      </div>
+    );
   };
 
   const filteredInitiatives = initiatives
@@ -93,7 +155,7 @@ const InitiativesPage = () => {
       <header>
         <div className="head-logo">
           <div className="logo">
-            <i className="bx bx-shield-plus" ></i>
+            <i className="bx bx-shield-plus"></i>
             <h4>Helping Hands</h4>
           </div>
         </div>
@@ -104,13 +166,15 @@ const InitiativesPage = () => {
             <li><Link to="/my-initiatives">Мої ініціативи</Link></li>
             <li><Link to="/about">Про нас</Link></li>
             <li className="log_in_m"><Link to="/log_in">Увійти <i className="bx bx-log-in"></i></Link></li>
+            <li><Link to="/profile">Профіль</Link></li>
+            <button onClick={addInitiative}>Додати ініціативу</button>
           </ul>
         </nav>
       </header>
 
       <main>
         <h2>Доступні ініціативи</h2>
-        
+
         <label htmlFor="city-filter">Фільтр за містом:</label>
         <select id="city-filter" onChange={handleCityFilter} value={cityFilter}>
           <option value="all">Всі міста</option>
@@ -120,12 +184,12 @@ const InitiativesPage = () => {
           <option value="Харків">Харків</option>
           <option value="Дніпро">Дніпро</option>
         </select>
-        
-        <label htmlFor="date-filter">Фільтр за датою:</label>
+
+        <label htmlFor="date-filter">Сортувати за датою:</label>
         <select id="date-filter" onChange={handleDateSort}>
           <option value="all">Всі дати</option>
-          <option value="oldest">Старіші</option>
-          <option value="newest">Новіші</option>
+          <option value="oldest">Фільтрувати спочатку всі новіші</option>
+          <option value="newest">Фільтрувати спочатку всі старіші</option>
         </select>
 
         <label htmlFor="type-filter">Тип ініціативи:</label>
@@ -147,6 +211,8 @@ const InitiativesPage = () => {
               <p><strong>Залишилось волонтерів:</strong> <span className="volunteers-needed">{initiative.neededVolunteers}</span></p>
               <p><strong>Тип зустрічі:</strong> {initiative.type}</p>
               <p>{initiative.description}</p>
+              
+              {renderRatingStars(initiative.id)}
               <button
                 className="join-btn"
                 onClick={() => handleJoinClick(initiative)}
@@ -159,27 +225,27 @@ const InitiativesPage = () => {
         </div>
       </main>
 
-    {showModal && (
+      {showModal && (
         <div className="modal">
-            <div className="modal-content">
-                <h3>Введіть ваші дані</h3>
-                <input
-                    type="text"
-                    placeholder="Ваше ім'я"
-                    value={userName}
-                    onChange={(e) => setUserName(e.target.value)}
-                />
-                <input
-                    type="email"
-                    placeholder="Ваш Email"
-                    value={userEmail}
-                    onChange={(e) => setUserEmail(e.target.value)}
-                />
-                <button onClick={handleConfirmJoin}>Підтвердити</button>
-                <button onClick={() => setShowModal(false)}>Скасувати</button>
-            </div>
+          <div className="modal-content">
+            <h3>Введіть ваші дані</h3>
+            <input
+              type="text"
+              placeholder="Ваше ім'я"
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
+            />
+            <input
+              type="email"
+              placeholder="Ваш Email"
+              value={userEmail}
+              onChange={(e) => setUserEmail(e.target.value)}
+            />
+            <button onClick={handleConfirmJoin}>Підтвердити</button>
+            <button onClick={() => setShowModal(false)}>Скасувати</button>
+          </div>
         </div>
-    )}
+      )}
 
       <footer>
         <p>Приєднуйтесь до нас і станьте частиною змін!</p>
