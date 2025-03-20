@@ -15,8 +15,7 @@ const InitiativesPage = () => {
   const [selectedInitiative, setSelectedInitiative] = useState(null);
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
-  const [ratings, setRatings] = useState({});//для оцінок
-
+  const [ratings, setRatings] = useState({}); // для оцінок
 
   useEffect(() => {
     const fetchInitiatives = async () => {
@@ -35,7 +34,7 @@ const InitiativesPage = () => {
     fetchInitiatives();
   }, []);
 
-  // Функція для додавання нової ініціативи
+  // Додавання нової ініціативи
   const addInitiative = async () => {
     try {
       const docRef = await addDoc(collection(db, "initiatives"), {
@@ -112,7 +111,6 @@ const InitiativesPage = () => {
     }
   };
 
-  // Відображення зірочок для оцінювання
   const renderRatingStars = (initiativeId) => {
     const currentRating = ratings[initiativeId] || 0;
 
@@ -124,18 +122,20 @@ const InitiativesPage = () => {
             className={`star ${star <= currentRating ? "active" : ""}`}
             onClick={() => handleRating(initiativeId, star)}
           >
-            ⭐
+            ☆
           </span>
         ))}
       </div>
     );
   };
 
+  // Фільтрація ініціатив
   const filteredInitiatives = initiatives
     .filter((initiative) => cityFilter === "all" || initiative.place === cityFilter)
     .filter((initiative) => dateFilter === "all" || new Date(initiative.date) >= new Date())
     .filter((initiative) => typeFilter === "all" || initiative.type === typeFilter);
 
+  // Сортування за датою
   const handleDateSort = (e) => {
     const sorted = [...filteredInitiatives].sort((a, b) => {
       if (e.target.value === "oldest") {
