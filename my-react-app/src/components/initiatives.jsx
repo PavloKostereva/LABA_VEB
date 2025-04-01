@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Link } from 'react-router-dom';
-import '../assets/css/all.css';
-import help1 from '../assets/img/img_initiatives/help1.jpg';
+import { Link, useNavigate } from 'react-router-dom';
+import { collection, getDocs, doc, updateDoc, arrayUnion } from "firebase/firestore";
 import { db, auth } from "../js/firebase";
-import { collection, getDocs, addDoc, doc, setDoc } from "firebase/firestore";
+import axios from 'axios';
+import '../assets/css/all.css';
 
 const InitiativesPage = () => {
   const [initiatives, setInitiatives] = useState([]);
@@ -11,147 +11,211 @@ const InitiativesPage = () => {
   const [cityFilter, setCityFilter] = useState("all");
   const [dateFilter, setDateFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
-  const [showModal, setShowModal] = useState(false);
-  const [selectedInitiative, setSelectedInitiative] = useState(null);
-  const [userName, setUserName] = useState("");
-  const [userEmail, setUserEmail] = useState("");
-  const [ratings, setRatings] = useState({}); // для оцінок
+  const [ratings, setRatings] = useState({});
+  const [averageRatings, setAverageRatings] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 6;
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchInitiatives = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "initiatives"));
-        const initiativesList = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setInitiatives(initiativesList);
+        const initiativesData = [];
+        
+        querySnapshot.forEach((doc) => {
+          initiativesData.push({ id: doc.id, ...doc.data() });
+        });
+
+        setInitiatives(initiativesData);
+        
+        initiativesData.forEach(async (initiative) => {
+          await fetchRating(initiative.id);
+        });
       } catch (error) {
-        console.error("Помилка під час отримання ініціатив: ", error);
+        console.error("Error fetching initiatives:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchInitiatives();
   }, []);
 
-  // Додавання нової ініціативи
-  const addInitiative = async () => {
+  useEffect(() => {
+    setPage(1);
+  }, [cityFilter, dateFilter, typeFilter]);
+  const fetchRating = async (initiativeId) => {
     try {
-      const docRef = await addDoc(collection(db, "initiatives"), {
-        title: "Допомога дітям",
-        date: "2025-03-10",
-        place: "Львів",
-        neededVolunteers: 10,
-        type: "Соціальні",
-        img: "help1.jpg",
-        description: "Допомога дітям у дитячому будинку.",
-      });
-      console.log("Документ успішно створено з ID: ", docRef.id);
+      const response = await axios.get(
+        `http://localhost:3001/api/initiatives/${initiativeId}/rating`,
+        { 
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      
+      setAverageRatings(prev => ({
+        ...prev,
+        [initiativeId]: {
+          average: parseFloat(response.data.averageRating).toFixed(2),
+          count: response.data.count
+        }
+      }));
     } catch (error) {
-      console.error("Помилка при додаванні документа: ", error);
+      console.error("Помилка отримання рейтингу:", error);
+      setAverageRatings(prev => ({
+        ...prev,
+        [initiativeId]: {
+          average: 0,
+          count: 0
+        }
+      }));
     }
   };
 
-  const handleJoinClick = (initiative) => {
-    setSelectedInitiative(initiative);
-    setShowModal(true);
-  };
-
-  const handleConfirmJoin = async () => {
-    if (!userName || !userEmail) return;
-    const updatedInitiatives = [...initiatives];
-    const initiativeIndex = updatedInitiatives.findIndex(
-      (item) => item.id === selectedInitiative.id
-    );
-
-    if (initiativeIndex !== -1 && updatedInitiatives[initiativeIndex].neededVolunteers > 0) {
-      updatedInitiatives[initiativeIndex].neededVolunteers--;
-      setInitiatives(updatedInitiatives);
-
-      const updatedMyInitiatives = [...myInitiatives, updatedInitiatives[initiativeIndex]];
-      setMyInitiatives(updatedMyInitiatives);
-
-      // Збереження ініціативи користувача в Firestore
-      if (auth.currentUser) {
-        await setDoc(doc(db, "userInitiatives", `${auth.currentUser.uid}_${selectedInitiative.id}`), {
-          userId: auth.currentUser.uid,
-          initiativeId: selectedInitiative.id,
-          initiative: selectedInitiative,
-        });
-      }
-    }
-
-    setShowModal(false);
-    setUserName("");
-    setUserEmail("");
-  };
-
-  // Функція для оцінювання
-  const handleRating = async (initiativeId, rating) => {
+  const handleJoinClick = async (initiative) => {
+    // Check if user is logged in
     if (!auth.currentUser) {
-      alert("Будь ласка, увійдіть, щоб залишити оцінку.");
+      navigate('/log_in'); // Redirect to login page
+      return;
+    }
+
+    // Check if already joined
+    if (myInitiatives.some(item => item.id === initiative.id)) {
+      return;
+    }
+
+    // Check if there are available spots
+    if (initiative.neededVolunteers <= 0) {
       return;
     }
 
     try {
-      await setDoc(doc(db, "ratings", `${auth.currentUser.uid}_${initiativeId}`), {
-        userId: auth.currentUser.uid,
-        initiativeId,
-        rating,
+      const initiativeRef = doc(db, "initiatives", initiative.id);
+      const user = auth.currentUser;
+      
+      await updateDoc(initiativeRef, {
+        volunteers: arrayUnion({
+          name: user.displayName || "Anonymous",
+          email: user.email,
+          userId: user.uid
+        }),
+        neededVolunteers: initiative.neededVolunteers - 1
       });
 
-      setRatings((prevRatings) => ({
-        ...prevRatings,
-        [initiativeId]: rating,
-      }));
+      // Update local state
+      const updatedInitiatives = initiatives.map(item => {
+        if (item.id === initiative.id) {
+          return {
+            ...item,
+            neededVolunteers: item.neededVolunteers - 1,
+            volunteers: [...(item.volunteers || []), {
+              name: user.displayName || "Anonymous",
+              email: user.email,
+              userId: user.uid
+            }]
+          };
+        }
+        return item;
+      });
 
-      console.log("Оцінка успішно додана!");
+      setInitiatives(updatedInitiatives);
+      setMyInitiatives(prev => [...prev, {
+        ...initiative,
+        neededVolunteers: initiative.neededVolunteers - 1
+      }]);
+      
     } catch (error) {
-      console.error("Помилка під час додавання оцінки: ", error);
+      console.error("Error joining initiative:", error);
     }
   };
 
-  const renderRatingStars = (initiativeId) => {
-    const currentRating = ratings[initiativeId] || 0;
+ const handleRating = async (initiativeId, rating) => {
+  try {
+    if (!auth.currentUser) {
+      alert('Please log in to rate initiatives');
+      navigate('/log_in');
+      return;
+    }
+    
+    const response = await axios.post(
+      `http://localhost:3001/api/initiatives/${initiativeId}/rate`,
+      {
+        userId: auth.currentUser.uid,
+        rating: Number(rating)
+      }
+    );
 
-    return (
+    // Update local state with transformed data
+    setAverageRatings(prev => ({
+      ...prev,
+      [initiativeId]: {
+        average: parseFloat(response.data.averageRating).toFixed(2),
+        count: response.data.count
+      }
+    }));
+    
+    // Update user's rating
+    setRatings(prev => ({ ...prev, [initiativeId]: rating }));
+    
+  } catch (error) {
+    console.error("Rating error:", error.response?.data || error.message);
+  }
+};
+
+
+const renderRatingStars = (initiativeId) => {
+  const ratingData = averageRatings[initiativeId] || { average: 0, count: 0 };
+  const userRating = ratings[initiativeId] || 0;
+
+  return (
+    <div className="rating-container">
       <div className="rating-stars">
         {[1, 2, 3, 4, 5].map((star) => (
           <span
             key={star}
-            className={`star ${star <= currentRating ? "active" : ""}`}
+            className={`star ${star <= userRating ? "active" : ""}`}
             onClick={() => handleRating(initiativeId, star)}
           >
-            ☆
+            {star <= userRating ? "★" : "☆"}
           </span>
         ))}
       </div>
-    );
-  };
+      
+      {ratingData.count > 0 && (
+        <div className="average-rating">
+          Average: {ratingData.average} ({ratingData.count} votes)
+        </div>
+      )}
+    </div>
+  );
+};
 
-  // Фільтрація ініціатив
   const filteredInitiatives = initiatives
     .filter((initiative) => cityFilter === "all" || initiative.place === cityFilter)
     .filter((initiative) => dateFilter === "all" || new Date(initiative.date) >= new Date())
     .filter((initiative) => typeFilter === "all" || initiative.type === typeFilter);
 
-  // Сортування за датою
   const handleDateSort = (e) => {
     const sorted = [...filteredInitiatives].sort((a, b) => {
-      if (e.target.value === "oldest") {
-        return new Date(a.date) - new Date(b.date);
-      } else {
-        return new Date(b.date) - new Date(a.date);
-      }
+      return e.target.value === "oldest" 
+        ? new Date(a.date) - new Date(b.date) 
+        : new Date(b.date) - new Date(a.date);
     });
     setInitiatives(sorted);
   };
 
-  const handleCityFilter = (e) => setCityFilter(e.target.value);
-  const handleTypeFilter = (e) => setTypeFilter(e.target.value);
+  const paginatedInitiatives = filteredInitiatives.slice(
+    (page - 1) * itemsPerPage,
+    page * itemsPerPage
+  );
 
   return (
-    <div>
+    <div className="initiatives-page">
       <header>
         <div className="head-logo">
           <div className="logo">
@@ -161,100 +225,144 @@ const InitiativesPage = () => {
         </div>
         <nav>
           <ul>
-            <li><Link to="/">Головна</Link></li>
-            <li><Link to="/initiatives">Доступні ініціативи</Link></li>
-            <li><Link to="/my-initiatives">Мої ініціативи</Link></li>
-            <li><Link to="/about">Про нас</Link></li>
-            <li className="log_in_m"><Link to="/log_in">Увійти <i className="bx bx-log-in"></i></Link></li>
-            <li><Link to="/profile">Профіль</Link></li>
-            <button onClick={addInitiative}>Додати ініціативу</button>
+            <li><Link to="/">Home</Link></li>
+            <li><Link to="/initiatives">Initiatives</Link></li>
+            <li><Link to="/my-initiatives">My Initiatives</Link></li>
+            <li><Link to="/about">About</Link></li>
+            <li className="log_in_m">
+              <Link to="/log_in">Login <i className="bx bx-log-in"></i></Link>
+            </li>
+            <li><Link to="/profile">Profile</Link></li>
           </ul>
         </nav>
       </header>
 
       <main>
-        <h2>Доступні ініціативи</h2>
+        <h2>Available Initiatives</h2>
 
-        <label htmlFor="city-filter">Фільтр за містом:</label>
-        <select id="city-filter" onChange={handleCityFilter} value={cityFilter}>
-          <option value="all">Всі міста</option>
-          <option value="Київ">Київ</option>
-          <option value="Львів">Львів</option>
-          <option value="Одеса">Одеса</option>
-          <option value="Харків">Харків</option>
-          <option value="Дніпро">Дніпро</option>
-        </select>
+        <div className="filters">
+          <div className="filter-group">
+            <label htmlFor="city-filter">City:</label>
+            <select 
+              id="city-filter" 
+              onChange={(e) => setCityFilter(e.target.value)} 
+              value={cityFilter}
+            >
+              <option value="all">All Cities</option>
+              <option value="Київ">Kyiv</option>
+              <option value="Львів">Lviv</option>
+              <option value="Одеса">Odesa</option>
+              <option value="Харків">Kharkiv</option>
+            </select>
+          </div>
 
-        <label htmlFor="date-filter">Сортувати за датою:</label>
-        <select id="date-filter" onChange={handleDateSort}>
-          <option value="all">Всі дати</option>
-          <option value="oldest">Фільтрувати спочатку всі новіші</option>
-          <option value="newest">Фільтрувати спочатку всі старіші</option>
-        </select>
+          <div className="filter-group">
+            <label htmlFor="date-filter">Date:</label>
+            <select 
+              id="date-filter" 
+              onChange={(e) => setDateFilter(e.target.value)} 
+              value={dateFilter}
+            >
+              <option value="all">All Dates</option>
+              <option value="upcoming">Upcoming</option>
+            </select>
+          </div>
 
-        <label htmlFor="type-filter">Тип ініціативи:</label>
-        <select id="type-filter" onChange={handleTypeFilter} value={typeFilter}>
-          <option value="all">Тип ініціативи: </option>
-          <option value="Соціальні">Соціальні</option>
-          <option value="Екологія">Екологія</option>
-          <option value="Допомога тваринам">Допомога тваринам</option>
-        </select>
+          <div className="filter-group">
+            <label htmlFor="type-filter">Type:</label>
+            <select 
+              id="type-filter" 
+              onChange={(e) => setTypeFilter(e.target.value)} 
+              value={typeFilter}
+            >
+              <option value="all">All Types</option>
+              <option value="Соціальні">Social</option>
+              <option value="Екологія">Ecology</option>
+              <option value="Допомога тваринам">Animal Help</option>
+            </select>
+          </div>
 
-        <div className="grid-container" id="initiatives-container">
-          {filteredInitiatives.map((initiative) => (
-            <article key={initiative.id} className="initiative-card">
-              <img src={initiative.img} alt={initiative.title} />
-              <div className="initiative-text">{initiative.title}</div>
-              <h3>{initiative.title}</h3>
-              <p><strong>Дата:</strong> {initiative.date}</p>
-              <p><strong>Місце:</strong> {initiative.place}</p>
-              <p><strong>Залишилось волонтерів:</strong> <span className="volunteers-needed">{initiative.neededVolunteers}</span></p>
-              <p><strong>Тип зустрічі:</strong> {initiative.type}</p>
-              <p>{initiative.description}</p>
-              
-              {renderRatingStars(initiative.id)}
-              <button
-                className="join-btn"
-                onClick={() => handleJoinClick(initiative)}
-                disabled={initiative.neededVolunteers <= 0 || myInitiatives.some(item => item.id === initiative.id)}
-              >
-                {initiative.neededVolunteers <= 0 || myInitiatives.some(item => item.id === initiative.id) ? "Ви приєдналися" : "Приєднатися"}
-              </button>
-            </article>
-          ))}
-        </div>
-      </main>
-
-      {showModal && (
-        <div className="modal">
-          <div className="modal-content">
-            <h3>Введіть ваші дані</h3>
-            <input
-              type="text"
-              placeholder="Ваше ім'я"
-              value={userName}
-              onChange={(e) => setUserName(e.target.value)}
-            />
-            <input
-              type="email"
-              placeholder="Ваш Email"
-              value={userEmail}
-              onChange={(e) => setUserEmail(e.target.value)}
-            />
-            <button onClick={handleConfirmJoin}>Підтвердити</button>
-            <button onClick={() => setShowModal(false)}>Скасувати</button>
+          <div className="filter-group">
+            <label htmlFor="sort">Sort:</label>
+            <select id="sort" onChange={handleDateSort}>
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+            </select>
           </div>
         </div>
-      )}
+
+        {loading ? (
+          <div className="loading">Loading initiatives...</div>
+        ) : (
+          <>
+            <div className="grid-container">
+              {paginatedInitiatives.map((initiative) => (
+                <article key={initiative.id} className="initiative-card">
+                  <img 
+                    src={`/assets/img/${initiative.img}`} 
+                    alt={initiative.title} 
+                    onError={(e) => {
+                      e.target.src = '../src/assets/img/img_initiatives/help1.jpg';
+                    }}
+                  />
+                  <div className="initiative-content">
+                    <h3>{initiative.title}</h3>
+                    <p><strong>Date:</strong> {new Date(initiative.date).toLocaleDateString()}</p>
+                    <p><strong>Location:</strong> {initiative.place}</p>
+                    <p>
+                      <strong>Volunteers Needed:</strong> 
+                      <span className={`volunteers-needed ${initiative.neededVolunteers <= 0 ? "full" : ""}`}>
+                        {initiative.neededVolunteers}
+                      </span>
+                    </p>
+                    <p><strong>Type:</strong> {initiative.type}</p>
+                    <p className="description">{initiative.description}</p>
+                    
+                    {renderRatingStars(initiative.id)}
+                    
+                    <button
+                      className={`join-btn ${initiative.neededVolunteers <= 0 || myInitiatives.some(item => item.id === initiative.id) ? "joined" : ""}`}
+                      onClick={() => handleJoinClick(initiative)}
+                      disabled={initiative.neededVolunteers <= 0 || myInitiatives.some(item => item.id === initiative.id)}
+                    >
+                      {initiative.neededVolunteers <= 0 
+                        ? "No spots left" 
+                        : myInitiatives.some(item => item.id === initiative.id) 
+                          ? "You're joined" 
+                          : "Join"}
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            <div className="pagination">
+              <button 
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page === 1}
+              >
+                Previous
+              </button>
+              <span>Page {page}</span>
+              <button 
+                onClick={() => setPage(p => p + 1)}
+                disabled={page * itemsPerPage >= filteredInitiatives.length}
+              >
+                Next
+              </button>
+            </div>
+          </>
+        )}
+      </main>
 
       <footer>
-        <p>Приєднуйтесь до нас і станьте частиною змін!</p>
+        <p>Join us and be part of the change!</p>
         <p>
-          Контакти:
+          Contacts:
           <a href="mailto:volunteer@initiative.org">volunteer@initiative.org</a> |
           <a href="tel:+380991234567">+380 99 123 45 67</a>
         </p>
-        <a href="#">Політика конфіденційності</a>
+        <a href="#">Privacy Policy</a>
       </footer>
     </div>
   );

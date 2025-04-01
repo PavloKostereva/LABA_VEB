@@ -391,15 +391,70 @@ footer a:hover {
     margin: 10px 0;
 }
 
-.star {
-    font-size: 24px;
-    color: white;
-    cursor: pointer;
-    transition: color 0.2s;
+
+
+
+.rating-container {
+    margin: 15px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }
 
-.star.active {
-    color: green;
+.rating-stars {
+    font-size: 24px;
+}
+
+.star {
+    cursor: pointer;
+    color: #ccc;
+    margin-right: 5px;
+}
+
+
+
+.loading-ratings {
+    font-size: 14px;
+    color: #999;
+    font-style: italic;
+}
+
+
+/* Додати ці стилі для рейтингу */
+.rating-container {
+    margin: 15px 0;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+.rating-stars {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.rating-stars span {
+    cursor: pointer;
+    font-size: 28px;
+    color: #e4e5e9;
+    transition: all 0.2s ease;
+}
+
+.rating-stars span:hover {
+    transform: scale(1.1);
+}
+
+.rating-stars span.active {
+    color: #ffc107;
+    text-shadow: 0 0 8px rgba(255, 193, 7, 0.3);
+}
+
+.average-rating {
+    font-size: 14px;
+    color: #6c757d;
+    margin-top: 8px;
+    font-style: italic;
 }
 /* плншет*/
 @media (max-width: 768px) {

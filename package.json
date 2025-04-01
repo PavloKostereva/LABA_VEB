@@ -1,6 +1,11 @@
 {
+  "type": "module",
   "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
     "firebase": "^11.4.0",
+    "firebase-admin": "^11.11.1",
     "react-router-dom": "^7.3.0"
   }
 }

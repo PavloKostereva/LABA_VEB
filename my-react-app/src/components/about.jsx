@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import '../assets/css/all.css';
+import '../assets/css/all.css'
 import partner1 from '../assets/img/img_about/partner1.png';
 import partner2 from '../assets/img/img_about/partner2.png';
 import partner3 from '../assets/img/img_about/partner3.png';
